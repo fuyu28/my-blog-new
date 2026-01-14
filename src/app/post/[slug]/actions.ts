@@ -18,8 +18,9 @@ function sha256(value: string) {
   return createHash("sha256").update(value).digest("hex");
 }
 
-function hasProtectedAccess(slug: string, expectedHash: string): boolean {
-  const cookie = cookies().get(protectedCookieName(slug));
+async function hasProtectedAccess(slug: string, expectedHash: string): Promise<boolean> {
+  const cookieStore = await cookies();
+  const cookie = cookieStore.get(protectedCookieName(slug));
   return cookie?.value === expectedHash;
 }
 
@@ -37,7 +38,7 @@ export async function loadProtectedPost(slug: string): Promise<ProtectedPostActi
   }
 
   const expectedHash = sha256(frontmatter.password);
-  if (!hasProtectedAccess(slug, expectedHash)) {
+  if (!(await hasProtectedAccess(slug, expectedHash))) {
     return { success: false };
   }
 
@@ -72,7 +73,8 @@ export async function verifyProtectedPostPassword(
     return { error: "パスワードが一致しません。" };
   }
 
-  cookies().set(protectedCookieName(slug), expectedHash, {
+  const cookieStore = await cookies();
+  cookieStore.set(protectedCookieName(slug), expectedHash, {
     httpOnly: true,
     sameSite: "lax",
     path: "/",
