@@ -108,7 +108,7 @@ CONTENT_DIR=content-repo
 
 ### 4. コンテンツリポジトリの準備
 
-ブログ記事用のリポジトリに`external_post/<slug>/index.md`の構成で Markdown を配置します。
+ブログ記事用のリポジトリに`external-posts/<slug>/index.md`の構成で Markdown を配置します。
 
 ### 5. コンテンツリポジトリの取得（ビルド時）
 
@@ -340,7 +340,7 @@ Error: Cannot find module '@/lib/...'
 開発サーバーのログに以下のような警告が表示される場合：
 
 ```
-⚠️  記事をスキップしました: content-repo/external_post/example/index.md
+⚠️  記事をスキップしました: content-repo/external-posts/example/index.md
    理由: Invalid frontmatter
 ⚠️  1件の記事がバリデーションエラーによりスキップされました
 ```

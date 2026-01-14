@@ -14,7 +14,7 @@ export interface PostEntry {
 }
 
 const DEFAULT_CONTENT_DIR = "content-repo";
-const POSTS_ROOT_DIR = "external_post";
+const POSTS_ROOT_DIR = "external-posts";
 const POST_ENTRY_FILENAME = "index.md";
 
 function resolvePostsRoot(): string {
