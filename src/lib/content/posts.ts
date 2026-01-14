@@ -63,26 +63,35 @@ function normalizeSlug(slug: string): string {
 
 async function listPostSlugs(postsRoot: string): Promise<string[]> {
   const entries = await fs.readdir(postsRoot, { withFileTypes: true });
-  const slugs = entries
+  const dirNames = entries
     .filter((entry) => entry.isDirectory() && !entry.name.startsWith("."))
-    .map((entry) => normalizeSlug(entry.name))
-    .sort((a, b) => a.localeCompare(b));
+    .map((entry) => normalizeSlug(entry.name));
+
+  const found: string[] = [];
 
   await Promise.all(
-    slugs.map(async (slug) => {
+    dirNames.map(async (slug) => {
       const filePath = path.join(postsRoot, slug, POST_ENTRY_FILENAME);
       try {
         await fs.access(filePath);
+        found.push(slug);
       } catch (error) {
         if (error instanceof Error) {
-          throw new Error(`Post entry not found: ${filePath}. Expected "${POST_ENTRY_FILENAME}".`);
+          console.warn(`Skipping directory without ${POST_ENTRY_FILENAME}: ${filePath}`);
+          return;
         }
         throw error;
       }
     }),
   );
 
-  return slugs;
+  if (found.length === 0) {
+    throw new Error(
+      `No posts found in ${postsRoot}. Expected "${DEFAULT_CONTENT_DIR}/<slug>/${POST_ENTRY_FILENAME}".`,
+    );
+  }
+
+  return found.sort((a, b) => a.localeCompare(b));
 }
 
 function resolvePostFilePath(postsRoot: string, slug: string): string {
