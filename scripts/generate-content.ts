@@ -19,13 +19,14 @@ type SerializedPostEntry = {
   content: string;
 };
 
-const DEFAULT_CONTENT_DIR = "content-repo";
-const POSTS_ROOT_DIR = "external-posts";
+const DEFAULT_CONTENT_DIR = "my-blog-contents";
+const DEFAULT_POSTS_ROOT_DIR = "external-posts";
 const POST_ENTRY_FILENAME = "index.md";
 
 function resolvePostsRoot(): string {
   const contentDir = process.env.CONTENT_DIR ?? DEFAULT_CONTENT_DIR;
-  return path.join(process.cwd(), contentDir, POSTS_ROOT_DIR);
+  const postsRootDir = process.env.POSTS_ROOT_DIR ?? DEFAULT_POSTS_ROOT_DIR;
+  return path.join(process.cwd(), contentDir, postsRootDir);
 }
 
 function toPosixPath(filePath: string): string {
@@ -76,7 +77,7 @@ async function listPostSlugs(postsRoot: string): Promise<string[]> {
 
   if (found.length === 0) {
     throw new Error(
-      `No posts found in ${postsRoot}. Expected "${DEFAULT_CONTENT_DIR}/${POSTS_ROOT_DIR}/<slug>/${POST_ENTRY_FILENAME}".`,
+      `No posts found in ${postsRoot}. Expected "${DEFAULT_CONTENT_DIR}/${DEFAULT_POSTS_ROOT_DIR}/<slug>/${POST_ENTRY_FILENAME}".`,
     );
   }
 
@@ -128,6 +129,7 @@ async function assertPostsRootExists(postsRoot: string): Promise<void> {
 
 async function buildPosts(): Promise<SerializedPostEntry[]> {
   const contentDir = process.env.CONTENT_DIR ?? DEFAULT_CONTENT_DIR;
+  const postsRootDir = process.env.POSTS_ROOT_DIR ?? DEFAULT_POSTS_ROOT_DIR;
   const postsRoot = resolvePostsRoot();
   await assertPostsRootExists(postsRoot);
   const slugs = await listPostSlugs(postsRoot);
@@ -137,7 +139,7 @@ async function buildPosts(): Promise<SerializedPostEntry[]> {
       const absolutePath = resolvePostFilePath(postsRoot, slug);
       const raw = await fs.readFile(absolutePath, "utf-8");
       const { frontmatter, content } = parsePost(raw);
-      const posixPath = toPosixPath(path.join(contentDir, slug, POST_ENTRY_FILENAME));
+      const posixPath = toPosixPath(path.join(contentDir, postsRootDir, slug, POST_ENTRY_FILENAME));
 
       return {
         slug,

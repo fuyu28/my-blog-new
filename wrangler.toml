@@ -1,4 +1,4 @@
-name = "my-blog"
+name = "fuyu-blog"
 main = ".open-next/worker.js"
 compatibility_date = "2025-02-01"
 compatibility_flags = ["nodejs_compat"]

@@ -17,6 +17,9 @@
 /.next/
 /out/
 
+# open next
+/.open-next/
+
 # production
 /build
 
@@ -47,3 +50,5 @@ cf-pages_id_ed25519
 *.key
 id_ed25519
 id_ed25519.pub
+
+/my-blog-contents/

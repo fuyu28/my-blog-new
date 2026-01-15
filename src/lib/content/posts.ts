@@ -1,6 +1,5 @@
 import { Frontmatter } from "./frontmatterSchema";
 import { notFound } from "next/navigation";
-import { cacheLife, cacheTag } from "next/cache";
 import {
   posts as generatedPosts,
   SerializedFrontmatter,
@@ -14,26 +13,23 @@ export interface PostEntry {
   frontmatter: Frontmatter;
 }
 
-const DEFAULT_CONTENT_DIR = "content-repo";
-const POSTS_ROOT_DIR = "external-posts";
+const DEFAULT_CONTENT_DIR = "my-blog-contents";
+const DEFAULT_POSTS_ROOT_DIR = "external-posts";
 const POST_ENTRY_FILENAME = "index.md";
 
 function formatPostPath(slug: string): string {
   const contentDir = process.env.CONTENT_DIR ?? DEFAULT_CONTENT_DIR;
-  return `${contentDir}/${POSTS_ROOT_DIR}/${slug}/${POST_ENTRY_FILENAME}`;
+  const postsRootDir = process.env.POSTS_ROOT_DIR ?? DEFAULT_POSTS_ROOT_DIR;
+  return `${contentDir}/${postsRootDir}/${slug}/${POST_ENTRY_FILENAME}`;
 }
 
 /**
- * external-posts 以下の index.md を取得（内部関数・キャッシュ化）
- * Cache Components機能で1時間キャッシュ
+ * external-posts 以下の index.md を取得（内部関数）
  *
  * エラーハンドリング: バリデーションエラーがある記事はスキップし、警告ログを出力
  * @returns キャッシュされた記事一覧（Dateフィールドは文字列）
  */
 async function listPostsCached(): Promise<SerializedPostEntry[]> {
-  "use cache";
-  cacheLife("hours");
-  cacheTag("posts");
   if (generatedPosts.length === 0) {
     throw new Error(
       `No posts found in generated data. Run "bun run generate:content" before building.`,
@@ -96,17 +92,13 @@ export async function listPublicPosts(): Promise<PostEntry[]> {
 }
 
 /**
- * スラグから記事を取得（内部関数・キャッシュ化）
- * Cache Components機能で1時間キャッシュ
+ * スラグから記事を取得（内部関数）
  * @param slug 記事のスラグ
  * @returns キャッシュされた記事データ（Dateフィールドは文字列）
  */
 async function getPostBySlugCached(
   slug: string,
 ): Promise<{ frontmatter: SerializedFrontmatter; content: string }> {
-  "use cache";
-  cacheLife("hours");
-  cacheTag("posts", `post-${slug}`);
   const entry = generatedPosts.find((post) => post.slug === slug);
   if (!entry) {
     throw new Error(`Post not found: ${slug}`);

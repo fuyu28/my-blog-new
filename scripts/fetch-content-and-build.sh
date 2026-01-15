@@ -26,7 +26,8 @@ clone_repo() {
     git clone --depth=1 "$repo" "$dest"
 }
 
-clone_repo git@github.com:fuyu28/my-blog-contents.git content-repo
+CONTENT_DIR="${CONTENT_DIR:-my-blog-contents}"
+clone_repo git@github.com:fuyu28/my-blog-contents.git "$CONTENT_DIR"
 
 # --- 依存 & ビルド ---
 bun install --frozen-lockfile
